@@ -22,4 +22,29 @@ OGPやOGPを使ってシェアされたものの例は[Facebookのウェブ管�
 
 ## OGP用に本文の冒頭を抽出し、OGPを埋め込む方法
 
-TBD
+### 準備
+Rubyを使います。
+`aozora2html`が必要です。
+```
+gem install aozora2html
+```
+
+### 実行
+以下を実行すると指定した図書カードのHTMLにOGPのためのメタデータを埋め込めます。
+```
+ruby aozora2unicode.rb --apply-ogp --csv-file CSV INPUT OUTPUT
+```
+- `CSV`: `list_person_all_extended_utf8.csv`に相当するファイルかそれを圧縮したzipファイル、またはそのURL
+- `INPUT`: 図書カードのHTMLファイル、またはそのURL
+- `OUTPUT`: 出力先のファイル名
+
+このとき以下で生成される内容の先頭256文字が図書カードのdescription（FacebookやTwitterで表示される説明文）になります。
+```
+ruby aozora2unicode.rb INPUT OUTPUT
+```
+`INPUT`（青空文庫のテキストファイル/それを圧縮したzipファイル/そのzipファイルのURL）からUTF-8のテキストファイルを生成して`OUTPUT`に出力されます。
+- アクセント符号→対応するUnicodeに置換
+- 外字→対応するUnicodeに置換（あれば）
+- ルビ→漢字（かんじ）
+- 字下げ等のタグ→削除
+- 外部の画像等→`alt`属性のみ
