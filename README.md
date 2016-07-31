@@ -32,7 +32,7 @@ gem install aozora2html
 ### 実行
 以下を実行すると指定した図書カードのHTMLにOGPのためのメタデータを埋め込めます。
 ```
-ruby aozora2unicode.rb --apply-ogp --csv-file CSV INPUT OUTPUT
+ruby aozora2unicode.rb --apply-ogp CSV INPUT OUTPUT
 ```
 - `CSV`: `list_person_all_extended_utf8.csv`に相当するファイルかそれを圧縮したzipファイル、またはそのURL
 - `INPUT`: 図書カードのHTMLファイル、またはそのURL
