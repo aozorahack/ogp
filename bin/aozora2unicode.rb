@@ -213,102 +213,10 @@ class Aozora2Html
   end
 end
 
-opt = OptionParser.new("Usage: aozora2unicode [options] <file> [<html file>]\n")
-opt.on('--csv-file CSV', 'setting csv file')
-opt.on('--apply-ogp', 'setting card html')
-opt.version = Aozora2Html::VERSION
-options = opt.getopts
-
-Accent_tag.use_jisx0213 = true
-Embed_Gaiji_tag.use_jisx0213 = true
-Embed_Gaiji_tag.use_unicode = true
-
-if ARGV.size < 1 || ARGV.size > 2
-  $stderr.print opt.banner
-  exit 1
-end
-
-src_file, dest_file = ARGV[0], ARGV[1]
-title = ""
-
-Dir.mktmpdir do |dir|
-  if options["apply-ogp"]
-    if src_file =~ /\Ahttps?:/
-      require 'open-uri'
-      down_file = File.join(dir, File.basename(src_file))
-      begin
-        open(down_file, "wb") do |f0|
-          open(src_file){|f1| f0.write(f1.read)}
-        end
-        src_file = down_file
-      rescue
-        $stderr.print "file not found: #{src_file}\n"
-        $stderr.print "Download Error: #{$!}\n"
-        exit 1
-      end
-    else
-      if !File.exist?(src_file)
-        $stderr.print "file not found: #{src_file}\n"
-        exit 1
-      end
-    end
-    card_file = src_file
-  end
-
-  if card_file
-    if options["csv-file"]
-      csv_file = options["csv-file"]
-      if csv_file =~ /\Ahttps?:/
-        require 'open-uri'
-        down_file = File.join(dir, File.basename(csv_file))
-        begin
-          open(down_file, "wb") do |f0|
-            open(csv_file){|f1| f0.write(f1.read)}
-          end
-          csv_file = down_file
-        rescue
-          $stderr.print "file not found: #{csv_file}\n"
-          $stderr.print "Download Error: #{$!}\n"
-          exit 1
-        end
-      else
-        if !File.exist?(csv_file)
-          $stderr.print "file not found: #{csv_file}\n"
-          exit 1
-        end
-      end
-    end
-
-    if File.extname(csv_file) == ".zip"
-      tmpfile = File.join(dir, "aozora.csv")
-      csv_file = tmpfile
-    end
-    if File.basename(card_file).match(/([0-9]+)/)
-      number = $1
-    else
-      $stderr.print "#{card_file} not found\n"
-      exit 1
-    end
-    File.open(csv_file, 'r:UTF-8') do |file|
-      file.each_line do |line|
-        if line.match("^\"0*#{number}\",\"([^\"]*)\"")
-          title = $1
-          if line.match(/(http[^,]+\.zip)/)
-            src_file = $1
-          else
-            $stderr.print "#{src_file} not found in #{csv_file}\n"
-            exit 1
-          end
-        end
-      end
-    end
-  end
-  if dest_file.nil?
-    dest_file = File.join(dir, "output.txt")
-  end
+def get_src_file(src_file)
   if src_file =~ /\Ahttps?:/
     require 'open-uri'
-    down_file = File.join(dir, File.basename(src_file))
+    down_file = File.join(@dir, File.basename(src_file))
     begin
       open(down_file, "wb") do |f0|
         open(src_file){|f1| f0.write(f1.read)}
@@ -325,48 +233,94 @@ Dir.mktmpdir do |dir|
       exit 1
     end
   end
+  src_file
+end
 
+def get_raw_file(src_file,ext,tmpfile_name)
   if File.extname(src_file) == ".zip"
-    tmpfile = File.join(dir, "aozora.txt")
-    Aozora2Html::Zip.unzip(src_file, tmpfile)
-    Aozora2Html.new(tmpfile, dest_file).process
-  else
-    Aozora2Html.new(src_file, dest_file).process
+    tmpfile = File.join(@dir, tmpfile_name)
+    ::Zip::File.open(src_file) do |zip_file|
+      entry = zip_file.glob(ext).first
+      entry.extract(tmpfile)
+    end
+    src_file = tmpfile
   end
+  src_file
+end
+
+opt = OptionParser.new("Usage: aozora2unicode [options] <file> [<text file>]\n")
+opt.on('--apply-ogp CSV', 'aozora csv file')
+opt.version = Aozora2Html::VERSION
+options = opt.getopts
+
+Accent_tag.use_jisx0213 = true
+Embed_Gaiji_tag.use_jisx0213 = true
+Embed_Gaiji_tag.use_unicode = true
+
+if ARGV.size < 1 || ARGV.size > 2
+  $stderr.print opt.banner
+  exit 1
+end
+
+src_file, dest_file = ARGV[0], ARGV[1]
+title = ""
+
+Dir.mktmpdir do |dir|
+  @dir = dir
+  if options["apply-ogp"]
+    src_file = get_src_file(src_file)
+    csv_file = get_src_file(options["apply-ogp"])
+    csv_file = get_raw_file(csv_file, "*.csv", "aozora.csv")
+    card_file = src_file
+    if File.basename(card_file).match(/([0-9]+)/)
+      number = format("%06d", $1.to_i)
+    else
+      $stderr.print "#{card_file} is invalid file name\n"
+      exit 1
+    end
+    File.open(csv_file, 'r:UTF-8') do |file|
+      file.each_line do |line|
+        if line.match("^\"#{number}\",\"([^\"]*)\"")
+          title = $1
+          if line.match(/(http[^,]+\.zip)/)
+            src_file = $1
+          else
+            $stderr.print "zip URL not found in #{csv_file}\n"
+            exit 1
+          end
+        end
+      end
+    end
+  end
+  if dest_file.nil?
+    dest_file = File.join(dir, "output.txt")
+  end
+  src_file = get_src_file(src_file)
+  src_file = get_raw_file(src_file, "*.txt", "aozora.txt")
+  Aozora2Html.new(src_file, dest_file).process
+
   output = File.read(dest_file, encoding: 'Shift_JIS:UTF-8')
+  output.gsub!("<br />", "")
   output.gsub!(/&#x([0-9A-F]{4,5});/) {|unicode|
     [$1.hex].pack("U*")
   }
-  output.gsub!("<br />", "")
   File.open(dest_file, "w") do |file|
     file.print output.encode("UTF-8")
   end
   if card_file
-    if card_file =~ /\Ahttps?:/
-      require 'open-uri'
-      down_file = File.join(dir, File.basename(card_file))
-      begin
-        open(down_file, "wb") do |f0|
-          open(card_file){|f1| f0.write(f1.read)}
-        end
-        card_file = down_file
-      rescue
-        $stderr.print "file not found: #{card_file}\n"
-        $stderr.print "Download Error: #{$!}\n"
-        exit 1
-      end
-    else
-      if !File.exist?(card_file)
-        $stderr.print "file not found: #{card_file}\n"
-        exit 1
-      end
-    end
     body = output[0, 256]
+    card_file = get_src_file(card_file)
     output = File.read(card_file, encoding: 'UTF-8')
-    output.gsub!("<head>".encode("UTF-8"), "<head prefix=\"og: http://ogp.me/ns#\">\r\n<meta property=\"og:type\" content=\"book\">\r\n\
-<meta property=\"og:image\" content=\"http://www.aozora.gr.jp/images/top_logo.png\">\r\n<meta property=\"og:image:type\" content=\"image/png\">\r\n<meta property=\"og:image:width\" content=\"100\">\r\n<meta property=\"og:image:height\" content=\"100\">\r\n\
-<meta property=\"og:title\" content=\"#{title}\">\r\n\
-<meta property=\"og:description\" content=\"#{body.encode("UTF-8")}\">\r\n<meta name=\"twitter:card\" content=\"summary\" />\r\n".encode("UTF-8"))
+    output.gsub!("<head>".encode("UTF-8"),
+    "<head prefix=\"og: http://ogp.me/ns#\">\r\n" +
+    "<meta property=\"og:type\" content=\"book\">\r\n" +
+    "<meta property=\"og:image\" content=\"http://www.aozora.gr.jp/images/top_logo.png\">\r\n" +
+    "<meta property=\"og:image:type\" content=\"image/png\">\r\n" +
+    "<meta property=\"og:image:width\" content=\"100\">\r\n" +
+    "<meta property=\"og:image:height\" content=\"100\">\r\n" +
+    "<meta property=\"og:title\" content=\"#{title}\">\r\n" +
+    "<meta property=\"og:description\" content=\"#{body.encode("UTF-8")+"cc".encode("UTF-8")}\">\r\n" +
+    "<meta name=\"twitter:card\" content=\"summary\" />\r\n".encode("UTF-8"))
     File.open(dest_file, "w") do |file|
       file.print output.encode("UTF-8")
     end
