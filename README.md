@@ -10,7 +10,7 @@ OGPやOGPを使ってシェアされたものの例は[Facebookのウェブ管�
 
 図書カード：No.5の[あいびき](http://www.aozora.gr.jp/cards/000005/card5.html)にOGPを設定してみました。
 
-添付している画像は、Facebookのシェアボタンを押した時とのスクリーンショットです。 [Open Graph Debugger](https://developers.facebook.com/tools/debug/)(閲覧にはログインが必要)を使って取得しています。Twitterでも同様の表示になります。
+添付している画像は、Facebookのシェアボタンを押した時とのスクリーンショットです。 [Open Graph Debugger](https://developers.facebook.com/tools/debug/)(閲覧にはログインが必要)を使って取得しています。オリジナル版以外はTwitterでも同様の表示になります。
 
 作者情報の表記は、[XHTML版](http://www.aozora.gr.jp/cards/000005/files/5_21310.html)のtitleタグの内容を参考にしています。
 
