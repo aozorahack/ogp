@@ -8,7 +8,7 @@ OGPやOGPを使ってシェアされたものの例は[Facebookのウェブ管�
 
 ## OGPの導入イメージ
 
-図書カード：No.5の[あいびき](http://www.aozora.gr.jp/cards/000005/card5.html)にOGPを設定してみました。
+図書カード：No.5の[あいびき](http://www.aozora.gr.jp/cards/000005/card5.html)( by [青空文庫](http://www.aozora.gr.jp/guide/kijyunn.html); [CC BY 2.1 JP](http://creativecommons.org/licenses/by/2.1/jp/) )に手を加えてOGPを設定してみました。
 
 添付している画像は、Facebookのシェアボタンを押した時とのスクリーンショットです。 [Open Graph Debugger](https://developers.facebook.com/tools/debug/)(閲覧にはログインが必要)を使って取得しています。オリジナル版以外はTwitterでも同様の表示になります。
 
