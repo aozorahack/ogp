@@ -48,3 +48,6 @@ ruby aozora2unicode.rb INPUT OUTPUT
 - ルビ→漢字（かんじ）
 - 字下げ等のタグ→削除
 - 外部の画像等→`alt`属性のみ
+
+## ライセンス
+このレポジトリのライセンスは[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)です。
