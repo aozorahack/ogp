@@ -8,7 +8,7 @@ OGPやOGPを使ってシェアされたものの例は[Facebookのウェブ管�
 
 ## OGPの導入イメージ
 
-図書カード：No.5の[あいびき](http://www.aozora.gr.jp/cards/000005/card5.html)にOGPを設定してみました。
+図書カード：No.5の[あいびき](http://www.aozora.gr.jp/cards/000005/card5.html)( by [青空文庫](http://www.aozora.gr.jp/guide/kijyunn.html); [CC BY 2.1 JP](http://creativecommons.org/licenses/by/2.1/jp/) )に手を加えてOGPを設定してみました。
 
 添付している画像は、Facebookのシェアボタンを押した時とのスクリーンショットです。 [Open Graph Debugger](https://developers.facebook.com/tools/debug/)(閲覧にはログインが必要)を使って取得しています。オリジナル版以外はTwitterでも同様の表示になります。
 
@@ -48,3 +48,6 @@ ruby aozora2unicode.rb INPUT OUTPUT
 - ルビ→漢字（かんじ）
 - 字下げ等のタグ→削除
 - 外部の画像等→`alt`属性のみ
+
+## ライセンス
+このレポジトリのライセンスは[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)です。
