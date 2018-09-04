@@ -1,6 +1,6 @@
 # ogp
 
-※[aozorahack hackathon #1(2016/07/30-31)](http://aozorahack.connpass.com/event/33921/)の成果物です。
+※[aozorahack hackathon #1(2016/07/30-31)](http://aozorahack.connpass.com/event/33921/)の成果物です。2018/07/26より、青空文庫本体に取り込まれています!(ref. [#7](https://github.com/aozorahack/ogp/issues/7))
 
 青空文庫の図書カードに[OGP](http://ogp.me/)を設定しました。 これにより、FacebookやTwitterでシェアした時などに表示される情報を改善できます。
 
